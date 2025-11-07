@@ -1,80 +1,119 @@
 'use client';
 
-import { useState } from 'react';
-import clsx from 'clsx';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import Input from '../ui/input';
+import Button from '../ui/button';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isClicked, setIsClicked] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleLogin = () => {
+  const router = useRouter();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsSuccess(false);
+
     if (!email || !password) {
-      alert('Please enter both email and password.');
+      setError('Please enter both email and password.');
       return;
     }
 
-    setIsClicked(true);
-
-    // Simulate login success
-    setTimeout(() => {
-      alert(`Logged in as ${email}`);
-      setIsClicked(false);
-    }, 1000);
+    try {
+      setIsLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      setIsSuccess(true);
+      console.log(`Logged in as ${email}`);
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-3xl font-semibold text-gray-800">
-          Welcome Back
-        </h1>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-indigo-50 via-sky-50 to-blue-100 p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="w-full max-w-md rounded-3xl bg-white/90 backdrop-blur-lg p-8 shadow-2xl border border-gray-100"
+      >
+        <div className="text-center mb-8">
+          <motion.h1
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl font-semibold text-gray-800"
+          >
+            Welcome to <span className="text-blue-600">Kiaan’s Memory Lane</span> 👋
+          </motion.h1>
+          <p className="mt-2 text-gray-500">Sign in to relive your favorite memories ✨</p>
+        </div>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleLogin();
-          }}
-          className="flex flex-col gap-4"
-        >
-          <input
+        <form onSubmit={handleLogin} className="flex flex-col gap-5">
+          <Input
+            label="Email"
             type="email"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-700 focus:border-blue-500 focus:outline-none"
+            required
           />
 
-          <input
+          <Input
+            label="Password"
             type="password"
+            placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-700 focus:border-blue-500 focus:outline-none"
+            required
           />
 
-          <button
+          {error && (
+            <p className="text-sm text-red-600 text-center" role="alert">
+              {error}
+            </p>
+          )}
+
+          <Button
             type="submit"
-            className={clsx(
-              'w-full rounded-lg px-4 py-2 text-white font-semibold transition-colors duration-300',
-              {
-                'bg-blue-500 hover:bg-blue-600': !isClicked,
-                'bg-green-500 hover:bg-green-600': isClicked,
-              },
-            )}
+            disabled={isLoading}
+            variant={isSuccess ? 'secondary' : 'primary'}
+            className="w-full mt-2"
           >
-            {isClicked ? 'Success!' : 'Log In'}
-          </button>
+            {isLoading
+              ? 'Logging in...'
+              : isSuccess
+              ? 'Success ✅'
+              : 'Log In'}
+          </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Don’t have an account?{' '}
-          <Link href="/signup" className="text-blue-500 hover:underline">
-            Sign up
-          </Link>
-        </p>
-      </div>
+        <div className="mt-8 flex flex-col items-center space-y-3">
+          <p className="text-sm text-gray-600">
+            Don’t have an account?{' '}
+            <Link href="/signup" className="text-blue-600 font-medium hover:underline">
+              Sign up
+            </Link>
+          </p>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push('/')}
+          >
+            ← Back to Home
+          </Button>
+        </div>
+      </motion.div>
     </main>
   );
 }
