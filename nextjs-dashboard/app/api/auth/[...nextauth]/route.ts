@@ -1,5 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import User from '@/models/User'
+import connect from "@/lib/dbConfig";
 
 // 1. Destructure the 'handlers' object from NextAuth
 const { handlers, auth, signIn, signOut } = NextAuth({
@@ -16,13 +18,21 @@ const { handlers, auth, signIn, signOut } = NextAuth({
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
-          // You can save the user to your DB here
-          const { name, email, image } = user;
-          console.log("User logged in via Google:", email);
-          return true;
+
+         await connect()
+         const existingUser = await User.findOne({email:user.email})
+
+         if(existingUser)
+         {
+            return true
+         }
+         else{
+            return "/unauthorized"
+         }
+        
         } catch (error) {
           console.log("Error saving user", error);
-          return false;
+          return "/something-went-wrong";
         }
       }
       return true;

@@ -74,8 +74,8 @@ export default function LoginPage() {
           >
             Hello Family ❤️
           </motion.h1>
-          <p className="mb-6 text-center text-red-950">
-            Sign in to relive your moments with Kiaan.
+          <p className="m-6 text-center text-red-950">
+            I'm your little Kiaan <span className='text-3xl'>👼</span><br></br> Sign in to relive your moments with me.
           </p>
         </div>
 
