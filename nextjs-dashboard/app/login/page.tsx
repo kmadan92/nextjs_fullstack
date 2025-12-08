@@ -10,6 +10,7 @@ import { signIn } from 'next-auth/react';
 import axios from 'axios';
 
 export default function LoginPage() {
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -30,6 +31,7 @@ export default function LoginPage() {
         try {
             setIsLoading(true);
             const response = await axios.post("/api/users/login", { email, password })
+            router.push("/dashboard")
 
         } catch (err) {
             setError('Something went wrong. Please try again.');
