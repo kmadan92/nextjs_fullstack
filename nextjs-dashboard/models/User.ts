@@ -1,6 +1,11 @@
 import mongoose, { Schema, models, model } from "mongoose";
 
 const UserSchema = new Schema({
+
+  name: { 
+    type: String, 
+    required: [true, "Please provide name"]
+  },
   email: { 
     type: String, 
     unique: [true,"Email already exist"],

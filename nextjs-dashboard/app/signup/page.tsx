@@ -1,119 +1,159 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import Input from '../ui/input';
 import Button from '../ui/button';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import axios from "axios"
 
 export default function SignUpPage() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-  });
+    const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        password: '',
+    });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState('');
-  const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
+    const [error, setError] = useState('');
+    const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsSuccess(false);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setIsSuccess(false);
 
-    if (!formData.fullName || !formData.email || !formData.password) {
-      setError('Please fill all mandatory fields.');
-      return;
-    }
+        if (!formData.fullName || !formData.email || !formData.password) {
+            setError('Please fill all mandatory fields.');
+            return;
+        }
 
-    try {
-      setIsLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // simulate API call
-      setIsSuccess(true);
-      console.log('Signup Data:', formData);
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        try {
+            setIsLoading(true);
+            const response = await axios.post("api/users/signup", formData) // simulate API call
+            setIsSuccess(true);
+            router.push('/login');
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg transition-shadow hover:shadow-xl">
-        <h1 className="mb-2 text-center text-3xl font-semibold text-gray-800">
-          Create Your Account ✨
-        </h1>
-        <p className="mb-6 text-center text-gray-500">
-          Join Kiaan’s Memory Lane and start creating moments.
-        </p>
+        } catch (err) {
+            setError('Something went wrong. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          
-            <Input
-              label="First Name *"
-              name="firstName"
-              placeholder="Enter first name"
-              required
-              value={formData.fullName}
-              onChange={handleChange}
-            />
+    return (
+        <main
+            className="flex min-h-screen flex-col items-center justify-center p-6"
+            style={{
+                backgroundImage: "url('/background-pattern.png')",
+                backgroundRepeat: 'repeat',
+                backgroundSize: '400px',
+                backgroundColor: '#FFFBF5'
+            }}
+        >
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="w-full max-w-md rounded-3xl bg-[#fff5eb]/95 backdrop-blur-xl p-8 shadow-xl shadow-stone-200/50 border border-white/50"
+            >
+                {/* Header Section */}
+                <div className="text-center mb-8">
+                    <motion.h1
+                        initial={{ scale: 0.95 }}
+                        animate={{ scale: 1 }}
+                        className="text-3xl font-bold text-red-900 tracking-tight"
+                    >
+                        Join the Family ❤️
+                    </motion.h1>
+                    <p className="m-6 text-center text-red-950">
+                        Create an account to view moments with<br /> little Kiaan <span className='text-2xl'>👼</span>
+                    </p>
+                </div>
 
-          <Input
-            label="Email *"
-            name="email"
-            type="email"
-            placeholder="you@example.com"
-            required
-            value={formData.email}
-            onChange={handleChange}
-          />
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
-          <Input
-            label="Password *"
-            name="password"
-            type="password"
-            placeholder="••••••••"
-            required
-            value={formData.password}
-            onChange={handleChange}
-          />
+                    <Input
+                        label="Full Name"
+                        labelClassname="text-sm font-medium text-red-950"
+                        name="fullName"
+                        placeholder="Enter your name"
+                        required
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        className="bg-[#fff5eb]/95 focus:ring-red-950 border-red-950"
+                    />
 
-          {error && (
-            <p className="text-sm text-red-600 text-center" role="alert">
-              {error}
-            </p>
-          )}
+                    <Input
+                        label="Email"
+                        labelClassname="text-sm font-medium text-red-950"
+                        name="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="bg-[#fff5eb]/95 focus:ring-red-950 border-red-950"
+                    />
 
-          <Button
-            type="submit"
-            disabled={isLoading}
-            variant={isSuccess ? 'secondary' : 'primary'}
-            className="w-full mt-2"
-          >
-            {isLoading ? 'Creating account...' : isSuccess ? 'Success 🎉' : 'Sign Up'}
-          </Button>
-        </form>
+                    <Input
+                        label="Password"
+                        labelClassname="text-sm font-medium text-red-950"
+                        name="password"
+                        type="password"
+                        placeholder="••••••••"
+                        required
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="bg-[#fff5eb]/95 focus:ring-red-950 border-red-950"
+                    />
 
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <a href="/login" className="text-blue-600 hover:underline">
-            Log in
-          </a>
-        </p>
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            className="p-3 rounded-lg bg-red-50 border border-red-100 text-sm text-red-600 text-center font-medium"
+                        >
+                            {error}
+                        </motion.div>
+                    )}
 
-        <div className="mt-6 text-center">
-          <Button variant="ghost" size="sm" onClick={() => router.push('/')}>
-            ← Back to Home
-          </Button>
-        </div>
-      </div>
-    </main>
-  );
+                    <Button
+                        type="submit"
+                        disabled={isLoading}
+                        className={`w-full py-3 text-base shadow-lg transition-all ${isSuccess
+                            ? 'bg-green-600 hover:bg-green-700'
+                            : 'bg-red-900 hover:bg-red-700'
+                            }`}
+                    >
+                        {isLoading ? 'Adding you to family...' : isSuccess ? 'Success! 🎉' : 'Sign Up'}
+                    </Button>
+
+                    <p className="text-sm text-center text-red-950">
+                        Already have an account?{' '}
+                        <Link href="/login" className="text-red-700 font-semibold hover:text-red-950 hover:underline transition-colors">
+                            Log in
+                        </Link>
+                    </p>
+                </form>
+
+                {/* Footer Links */}
+                <div className="mt-8 text-center space-y-4">
+                    <button
+                        onClick={() => router.push('/')}
+                        className="text-xs text-red-700 hover:text-red-950 transition-colors"
+                    >
+                        ← Return to Home
+                    </button>
+                </div>
+            </motion.div>
+        </main>
+    );
 }
