@@ -28,6 +28,12 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        if (!getUser.isApproved) {
+            return NextResponse.json({ error: "User is not authorized" },
+                { status: 403 }
+            )
+        }
+
         const checkPassword = await bcryptjs.compare(password, getUser.password)
 
         if (!checkPassword) {

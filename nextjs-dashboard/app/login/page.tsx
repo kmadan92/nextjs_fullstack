@@ -31,9 +31,13 @@ export default function LoginPage() {
         try {
             setIsLoading(true);
             const response = await axios.post("/api/users/login", { email, password })
+
             router.push("/dashboard")
 
-        } catch (err) {
+        } catch (err: any) {
+            if (err.response?.status == 403) {
+                router.push("/unauthorized")
+            }
             setError('Something went wrong. Please try again.');
         } finally {
             setIsLoading(false);
@@ -41,8 +45,14 @@ export default function LoginPage() {
     };
 
     const handleGoogleLogin = async () => {
-        setIsLoadingGoogle(true);
-        await signIn('google', { callbackUrl: '/dashboard' })
+        try {
+            setIsLoadingGoogle(true);
+            await signIn('google', { callbackUrl: '/dashboard' })
+        } catch (err: any) {
+            setError('Something went wrong. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
 
     };
 
@@ -95,7 +105,7 @@ export default function LoginPage() {
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                     </svg>
-                    {isLoadingGoogle ? 'Taking you to baba...' : 'Sign In with Google'}
+                    {isLoadingGoogle ? 'havan karenge..havan karenge...' : 'Sign In with Google'}
                 </Button>
 
                 {/* Elegant Divider */}
@@ -154,7 +164,7 @@ export default function LoginPage() {
                         disabled={isLoading}
                         className="w-full py-3 text-base shadow-lg bg-red-900 hover:bg-red-700"
                     >
-                        {isLoading ? 'Lets go to baba with kiaan...' : 'Sign In'}
+                        {isLoading ? 'havan karenge..havan karenge...' : 'Sign In'}
                     </Button>
 
                     <p className="text-sm text-center text-red-950">
