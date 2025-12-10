@@ -86,3 +86,17 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+export type Collection = {
+  id: string;
+  title: string;
+  thumbnail: string;
+  itemCount: number;
+  type: 'video' | 'photo';
+};
+
+export type Category = {
+  id: string;
+  title: string;
+  collections: Collection[];
+};

@@ -30,19 +30,35 @@ const { handlers, auth, signIn, signOut } = NextAuth({
                     await connect()
                     const existingUser = await User.findOne({ email: user.email })
 
-                    if (existingUser) {
-                        const checkForApproved = await User.findById(existingUser.isApproved)
-                        if (checkForApproved) {
+                    if (!existingUser) {
+
+                        const newuser = new User({
+                            name: user.name,
+                            email: user.email,
+                            accessToken: account.access_token,
+                            refreshToken: account.refresh_token
+
+                        })
+                        await newuser.save()
+                        return "/unauthorized"
+
+                    }
+                    else {
+
+                        existingUser.accessToken = account.access_token;
+                        if (account.refresh_token) {
+                            existingUser.refreshToken = account.refresh_token;
+                        }
+
+                        await existingUser.save()
+
+                        if (existingUser.isApproved) {
                             return true
                         }
                         else {
                             return "/unauthorized"
                         }
                     }
-                    else {
-                        return "/unauthorized"
-                    }
-
                 } catch (error) {
                     console.log("Error saving user", error);
                     return "/something-went-wrong";
