@@ -3,6 +3,8 @@ import User from "@/models/User";
 import bcryptjs from "bcryptjs";
 import connect from "@/lib/dbConfig";
 import jwt from "jsonwebtoken"
+import { getAccessToken } from "@/lib/auth";
+import { getRefreshToken } from "@/lib/auth";
 
 connect();
 
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest) {
 
         if (!getUser) {
             return NextResponse.json({ error: "User does not exist" },
-                { status: 400 }
+                { status: 401 }
             )
         }
 
@@ -38,22 +40,14 @@ export async function POST(request: NextRequest) {
 
         if (!checkPassword) {
             return NextResponse.json({ error: "Wrong Password" },
-                { status: 400 }
+                { status: 401 }
             )
         }
 
-        const tokenData = {
-            id: getUser._id,
-            email: getUser.email,
-            role: getUser.role
-        }
 
-        // 5. Generate TOKENS
-        // Access Token: Short life (e.g., 15 minutes) - Used for API calls
-        const accessToken = jwt.sign(tokenData, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "1d" })
+        const accessToken = getAccessToken(getUser)
 
-        // Refresh Token: Long life (e.g., 7 days) - Used to get new Access Tokens
-        const refreshToken = jwt.sign(tokenData, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: "7d" })
+        const refreshToken = getRefreshToken(getUser)
 
         getUser.refreshToken = refreshToken
         await getUser.save()

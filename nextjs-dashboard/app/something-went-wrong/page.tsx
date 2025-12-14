@@ -7,14 +7,14 @@ import { useRouter } from 'next/navigation';
 
 export default function SomethingWentWrongPage() {
 
-    const router = useRouter();
-    
+  const router = useRouter();
+
   return (
-    <main 
+    <main
       className="flex min-h-screen flex-col items-center justify-center p-6"
       style={{ backgroundColor: '#FFFBF5' }}
     >
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -32,7 +32,7 @@ export default function SomethingWentWrongPage() {
 
         {/* Kiaan's Message Box */}
         <div className="bg-white/60 backdrop-blur-sm p-6 rounded-2xl border border-red-100 shadow-sm">
-          <p className="text-red-950 text-lg leading-relaxed font-medium"> 
+          <p className="text-red-950 text-lg leading-relaxed font-medium">
             <br></br>Galti se mistake ho gya. 🍼 <br></br>Baccha samaj ke maaf karna
           </p>
           <p className="mt-4 text-sm text-red-800/70 italic">
@@ -47,19 +47,13 @@ export default function SomethingWentWrongPage() {
 
         {/* Action Buttons */}
         <div className="flex flex-col gap-3 pt-4">
-          <button 
+          <button
             onClick={() => router.back()}
             className="w-full py-3 px-6 rounded-xl bg-red-900 text-white font-medium shadow-lg hover:bg-red-800 transition-all transform hover:-translate-y-0.5"
           >
-            Let's Try Again
+            Go Back to Home
           </button>
 
-          <Link 
-            href="/dashboard"
-            className="w-full py-3 px-6 rounded-xl bg-white border border-red-100 text-red-900 font-medium hover:bg-red-50 transition-colors"
-          >
-            Go Back Home
-          </Link>
         </div>
 
       </motion.div>

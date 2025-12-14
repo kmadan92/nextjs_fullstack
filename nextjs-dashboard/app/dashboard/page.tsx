@@ -69,48 +69,8 @@ export default function DashboardPage(): React.JSX.Element {
     };
 
     return (
-        <main className="min-h-screen space-y-8 pb-10">
-
-            {/* Hero / Featured Section */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                // @ts-ignore - This ignores the specific Framer Motion type error if dependencies are mismatched
-                className="relative mb-10 h-[50vh] w-full overflow-hidden rounded-3xl shadow-2xl"
-            >
-                <Image
-                    src="https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&q=80&w=1200"
-                    alt="Featured"
-                    fill
-                    className="object-cover"
-                    priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute bottom-10 left-10 text-white">
-                    <h1 className="mb-2 text-5xl font-extrabold tracking-tight drop-shadow-lg">Kiaan&apos;s 1st Birthday</h1>
-                    <p className="mb-4 text-lg font-medium text-gray-200">Coming soon • Vizag Trip</p>
-                    <button className="rounded-lg bg-red-600 px-6 py-3 font-bold text-white shadow-lg hover:bg-red-700">
-                        Play Highlights
-                    </button>
-                </div>
-            </motion.div>
-
-            {/* Categories Rows */}
-            <div className="space-y-10">
-                {categories.map((category) => (
-                    <CategoryRow key={category.id} category={category} />
-                ))}
-            </div>
-
-            {/* Infinite Scroll Loader */}
-            <div ref={ref} className="flex h-24 w-full items-center justify-center">
-                {loading && (
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-red-200 border-t-red-600"></div>
-                        <p className="text-sm text-red-900/60 dark:text-stone-400">Loading memories...</p>
-                    </div>
-                )}
-            </div>
-        </main>
-    );
+        <>
+            <p>This is dashboard page</p>
+        </>
+    )
 }

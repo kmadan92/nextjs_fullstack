@@ -2,6 +2,8 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import User from '@/models/User'
 import connect from "@/lib/dbConfig";
+import { getAccessToken, getRefreshToken } from "@/lib/auth";
+import { cookies } from "next/headers";
 
 // 1. Destructure the 'handlers' object from NextAuth
 const { handlers, auth, signIn, signOut } = NextAuth({
@@ -32,27 +34,53 @@ const { handlers, auth, signIn, signOut } = NextAuth({
 
                     if (!existingUser) {
 
-                        const newuser = new User({
+                        const newuser = await new User({
                             name: user.name,
-                            email: user.email,
-                            accessToken: account.access_token,
-                            refreshToken: account.refresh_token
+                            email: user.email
+                        }).save()
 
-                        })
-                        await newuser.save()
+                        const accessToken = getAccessToken(newuser)
+                        const refreshToken = getRefreshToken(newuser)
+
+                        const updatedUser = await User.findByIdAndUpdate(
+                            newuser,
+                            { accessToken, refreshToken },
+                            { new: true }
+                        )
                         return "/unauthorized"
 
                     }
                     else {
+                        const accessToken = getAccessToken(existingUser)
+                        const refreshToken = getRefreshToken(existingUser)
 
-                        existingUser.accessToken = account.access_token;
-                        if (account.refresh_token) {
-                            existingUser.refreshToken = account.refresh_token;
-                        }
-
-                        await existingUser.save()
+                        const updatedUser = await User.findByIdAndUpdate(
+                            existingUser,
+                            { accessToken, refreshToken },
+                            { new: true }
+                        )
 
                         if (existingUser.isApproved) {
+
+                            // We access the browser cookies directly
+                            const cookieStore = await cookies();
+
+                            cookieStore.set("accessToken", accessToken, {
+                                httpOnly: true,
+                                secure: process.env.NODE_ENV === "production",
+                                sameSite: "lax", // 'lax' is better for OAuth redirects than 'strict'
+                                path: "/",
+                                maxAge: 60 * 60 * 24 // 1 day
+                            });
+
+                            cookieStore.set("refreshToken", refreshToken, {
+                                httpOnly: true,
+                                secure: process.env.NODE_ENV === "production",
+                                sameSite: "lax",
+                                path: "/",
+                                maxAge: 60 * 60 * 24 * 7 // 7 days
+                            });
+
                             return true
                         }
                         else {
