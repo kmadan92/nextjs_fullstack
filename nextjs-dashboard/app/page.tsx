@@ -20,6 +20,7 @@ export default function LoginPage() {
     const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
+
         e.preventDefault();
         setError('');
 
@@ -168,6 +169,8 @@ export default function LoginPage() {
                         type="submit"
                         disabled={isLoading}
                         className="w-full py-3 text-base shadow-lg bg-red-900 hover:bg-red-700"
+                        name="action"
+                        value="custom"
                     >
                         {isLoading ? 'havan karenge..havan karenge...' : 'Sign In'}
                     </Button>
