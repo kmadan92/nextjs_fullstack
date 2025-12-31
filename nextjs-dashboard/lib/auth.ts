@@ -28,3 +28,27 @@ export function getRefreshToken(user: any) {
     return refreshToken
 
 }
+
+export function calculateAccessTokenExpiry() {
+
+    return Date.now() + (24 * 60 * 60 * 1000)
+
+}
+
+export function calculateRefreshTokenExpiry() {
+
+    return Date.now() + (7 * 24 * 60 * 60 * 1000)
+
+}
+
+export function refreshAccessToken(token: any) {
+
+    return {
+        ...token,
+        accessToken: null,
+        refreshToken: null,
+        accessTokenExpiry: null,
+        refreshTokenExpiry: null
+    }
+
+}

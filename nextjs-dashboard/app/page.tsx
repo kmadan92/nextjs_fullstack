@@ -7,7 +7,6 @@ import Button from './ui/button';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { signIn } from 'next-auth/react';
-import axios from 'axios';
 
 export default function LoginPage() {
 
@@ -19,9 +18,12 @@ export default function LoginPage() {
 
     const router = useRouter();
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 
         e.preventDefault();
+
+        const formData = new FormData(e.currentTarget)
+
         setError('');
 
         if (!email || !password) {
@@ -31,20 +33,30 @@ export default function LoginPage() {
 
         try {
             setIsLoading(true);
-            const response = await axios.post("/api/users/login", { email, password })
+            const response = await signIn("credentials",
+                {
+                    email: formData.get("email"),
+                    password: formData.get("password"),
+                    redirect: false,
+                });
+
+            if (response?.url && response.url.includes("/unauthorized")) {
+                router.push("/unauthorized");
+                return;
+            }
+
+            if (response?.error) {
+
+                setError('Invalid email or password');
+                return
+            }
 
             router.push("/dashboard")
 
         } catch (err: any) {
-            if (err.response?.status == 403) {
-                router.push("/unauthorized")
-            }
-            else if (err.response?.status === 401) {
-                setError('Email or password is not correct');
-            }
-            else {
-                setError('Something went wrong. Please try again');
-            }
+
+            setError('Something went wrong. Please try again');
+
         } finally {
             setIsLoading(false);
         }
@@ -131,6 +143,7 @@ export default function LoginPage() {
                         labelClassname="text-sm font-medium text-red-950"
                         type="email"
                         placeholder="you@example.com"
+                        name="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -143,6 +156,7 @@ export default function LoginPage() {
                             labelClassname="text-sm font-medium text-red-950"
                             type="password"
                             placeholder="••••••••"
+                            name="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
