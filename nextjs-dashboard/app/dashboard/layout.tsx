@@ -1,5 +1,5 @@
 'use client';
-import SideNav from '@/app/ui/dashboard/sidenav';
+import SideNav from '@/app/components/dashboard/sidenav';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (

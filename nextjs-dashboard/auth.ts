@@ -5,6 +5,7 @@ import User from '@/models/User'
 import connect from "@/lib/dbConfig";
 import { getAccessToken, getRefreshToken, calculateAccessTokenExpiry, calculateRefreshTokenExpiry, refreshAccessToken } from "@/lib/auth";
 import bcryptjs from "bcryptjs";
+import { authConfig } from "./auth.config";
 
 // Create a custom error class to avoid polluting the server console
 class InfoError extends CredentialsSignin {
@@ -19,6 +20,7 @@ export const { handlers: { GET, POST },
     auth,
     signIn,
     signOut } = NextAuth({
+        ...authConfig,
         providers: [
             Credentials({
                 credentials: {
@@ -61,7 +63,7 @@ export const { handlers: { GET, POST },
                             accessToken: getAccessToken(getUser),
                             refreshToken: getRefreshToken(getUser),
                             accessTokenExpiry: calculateAccessTokenExpiry(),
-                            refreshTokenExpiry: calculateRefreshTokenExpiry(),
+                            refreshTokenExpiry: calculateRefreshTokenExpiry()
                         };
 
                     } catch (err: any) {
@@ -94,9 +96,10 @@ export const { handlers: { GET, POST },
 
                 if (account?.provider === "credentials") {
 
-                    if (!((user as any).role)) {
+                    if (!((user as any).isApproved)) {
                         return "/unauthorized"
                     }
+
                     return true
 
                 }
@@ -138,15 +141,30 @@ export const { handlers: { GET, POST },
                 // 1st login
                 if (user && account) {
 
+                    await connect()
+
                     if (account?.provider == "credentials") {
+
+                        await User.findOneAndUpdate(
+                            { email: user.email },
+                            {
+                                $set: {
+                                    accessToken: user.accessToken,
+                                    refreshToken: user.refreshToken
+                                }
+                            }
+                        )
 
                         return {
                             ...token,
-                            accessToken: (user as any).accessToken,
-                            refreshToken: (user as any).refreshToken,
-                            accessTokenExpiry: (user as any).accessTokenExpiry,
-                            refreshTokenExpiry: (user as any).refreshTokenExpiry,
-                            id: (user as any).id,
+                            accessToken: user.accessToken,
+                            refreshToken: user.refreshToken,
+                            accessTokenExpiry: user.accessTokenExpiry,
+                            refreshTokenExpiry: user.refreshTokenExpiry,
+                            id: user.id,
+                            email: user.email,
+                            role: user.role,
+                            isApproved: user.isApproved,
                             provider: account.provider
                         }
 
@@ -154,16 +172,33 @@ export const { handlers: { GET, POST },
 
                     if (account?.provider == "google") {
 
-                        await connect()
                         const db_user = await User.findOne({ email: user.email })
+
+                        const accessToken = getAccessToken(db_user)
+                        const refreshToken = getRefreshToken(db_user)
+                        const accessTokenExpiry = calculateAccessTokenExpiry()
+                        const refreshTokenExpiry = calculateRefreshTokenExpiry()
+
+                        await User.findByIdAndUpdate(
+                            db_user._id,
+                            {
+                                $set: {
+                                    accessToken: accessToken,
+                                    refreshToken: refreshToken
+                                }
+                            }
+                        )
 
                         return {
                             ...token,
-                            accessToken: account.access_token,
-                            refreshToken: account.refresh_token,
-                            accessTokenExpiry: calculateAccessTokenExpiry(),
-                            refreshTokenExpiry: calculateRefreshTokenExpiry(),
+                            accessToken: accessToken,
+                            refreshToken: refreshToken,
+                            accessTokenExpiry: accessTokenExpiry,
+                            refreshTokenExpiry: refreshTokenExpiry,
                             id: db_user._id.toString(),
+                            email: db_user.email,
+                            role: db_user.role,
+                            isApproved: db_user.isApproved,
                             provider: account.provider
                         }
                     }
@@ -189,7 +224,25 @@ export const { handlers: { GET, POST },
                 }
 
 
-                return token
+                return { ...token }
+
+            },
+
+            async session({ session, token }) {
+
+                if (token && session.user) {
+
+                    return {
+                        ...session,
+                        id: token.id,
+                        email: token.email,
+                        accessToken: token.accessToken,
+                        role: token.role,
+                        isApproved: token.isApproved
+                    }
+                }
+
+                return session
 
             }
 

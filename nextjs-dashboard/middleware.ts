@@ -1,60 +1,46 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { jwtVerify } from 'jose'
+import NextAuth from "next-auth";
+import { authConfig } from "./auth.config";
+import { NextResponse } from "next/server";
 
-// This function can be marked `async` if using `await` inside
-export async function middleware(request: NextRequest) {
-    /*
-        const token = request.cookies.get("accessToken")?.value
-    
-        let isUserLoggedIn = false
-        const publicPath = [
-            "/",
-            "/signup",
-            "/unauthorized"
-        ]
-        const IsPublicPath = publicPath.includes(request.nextUrl.pathname)
-    
-        if (token) {
-            try {
-                const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET)
-    
-                // If the token is invalid or expired, this line throws an error
-                await jwtVerify(token, secret)
-    
-                // If we reach here, no error occurred
-                isUserLoggedIn = true
-    
-            } catch (error) {
-                // Token is invalid, expired, or tampered with.
-                isUserLoggedIn = false
-            }
-        }
-    
-        if (IsPublicPath && isUserLoggedIn) {
-    
-            return NextResponse.redirect(new URL("/dashboard", request.nextUrl))
-        }
-    
-        if (!IsPublicPath && !isUserLoggedIn) {
-    
-            return NextResponse.redirect(new URL("/", request.nextUrl))
-    
-        }
-        return NextResponse.next()
-    
+// We initialize a "Lite" version of auth for the middleware
+const { auth } = NextAuth(authConfig);
+
+export default auth((req) => {
+    const { nextUrl } = req;
+    const isLoggedIn = !!req.auth; // req.auth contains the session
+
+    const publicPaths = ["/", "/signup", "/unauthorized"];
+    const isPublicPath = publicPaths.includes(nextUrl.pathname);
+
+    // 1. If user is logged in and tries to access public pages (like login/signup)
+    // Redirect them to the dashboard
+    if (isPublicPath && isLoggedIn) {
+        return NextResponse.redirect(new URL("/dashboard", nextUrl));
     }
-    
-    // Alternatively, you can use a default export:
-    // export default function proxy(request: NextRequest) { ... }
-    
-    // See "Matching Paths" below to learn more
-    export const config = {
-        matcher: [
-            '/',
-            '/signup',
-            '/dashboard',
-            '/dashboard/:path*'
-        ]
-            */
-}
+
+    // 2. If user is NOT logged in and tries to access protected pages
+    // Redirect them to the home/login page
+    if (!isPublicPath && !isLoggedIn) {
+        return NextResponse.redirect(new URL("/", nextUrl));
+    }
+
+    // 3. Special Case: Token Rotation Errors
+    // If the JWT callback returned a RefreshTokenExpired error
+    if ((req.auth as any)?.error === "RefreshTokenExpired") {
+        return NextResponse.redirect(new URL("/?error=SessionExpired", nextUrl));
+    }
+
+    return NextResponse.next();
+});
+
+export const config = {
+    matcher: [
+        /*
+         * Match all request paths except:
+         * 1. Next.js internals (_next/static, _next/image)
+         * 2. API routes (/api)
+         * 3. Static files with extensions (png, jpg, jpeg, gif, svg, ico)
+         */
+        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico)$|sitemap.xml|robots.txt).*)',
+    ],
+};

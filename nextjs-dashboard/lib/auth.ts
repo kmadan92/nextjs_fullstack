@@ -1,54 +1,73 @@
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
+import { JWT } from "next-auth/jwt";
+import connect from "./dbConfig";
+import User from "@/models/User";
+import { auth } from "@/auth";
+
+const validateSecrets = () => {
+    if (!process.env.ACCESS_TOKEN_SECRET || !process.env.REFRESH_TOKEN_SECRET) {
+        throw new Error("CRITICAL: JWT Secrets are missing in environment variables.");
+    }
+};
 
 export function getAccessToken(user: any) {
-
-    const tokenData = {
-        id: user._id,
-        email: user.email,
-        role: user.role
+    try {
+        validateSecrets();
+        const tokenData = {
+            id: user._id?.toString() || user.id,
+            email: user.email,
+            role: user.role,
+        };
+        // 1. Set to 1 minute
+        return jwt.sign(tokenData, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "1m" });
+    } catch (error) {
+        console.error("Error generating Access Token:", error);
+        throw error;
     }
-
-    // Access Token: Short life (e.g., 15 minutes) - Used for API calls
-    const accessToken = jwt.sign(tokenData, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "1d" })
-
-    return accessToken
 }
 
 export function getRefreshToken(user: any) {
-
-    const tokenData = {
-        id: user._id,
-        email: user.email,
-        role: user.role
+    try {
+        validateSecrets();
+        const tokenData = {
+            id: user._id?.toString() || user.id,
+            email: user.email,
+        };
+        // 2. Set to 3 minutes
+        return jwt.sign(tokenData, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: "3m" });
+    } catch (error) {
+        console.error("Error generating Refresh Token:", error);
+        throw error;
     }
-
-    // Refresh Token: Long life (e.g., 7 days) - Used to get new Access Tokens
-    const refreshToken = jwt.sign(tokenData, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: "7d" })
-
-    return refreshToken
-
 }
 
-export function calculateAccessTokenExpiry() {
+// 3. Update calculations (1 min = 60,000ms; 3 min = 180,000ms)
+export const calculateAccessTokenExpiry = () => Date.now() + 1 * 60 * 1000;
+export const calculateRefreshTokenExpiry = () => Date.now() + 3 * 60 * 1000;
 
-    return Date.now() + (24 * 60 * 60 * 1000)
+export async function refreshAccessToken(token: JWT): Promise<JWT> {
+    try {
+        await connect();
+        const user = await User.findById(token.id);
 
-}
+        if (!user) return { ...token, error: "UserNotFound" };
 
-export function calculateRefreshTokenExpiry() {
+        if (user.refreshToken !== token.refreshToken) {
+            return { ...token, error: "TokenMismatch" };
+        }
 
-    return Date.now() + (7 * 24 * 60 * 60 * 1000)
+        const accessToken = getAccessToken(user);
+        const accessTokenExpiry = calculateAccessTokenExpiry();
 
-}
+        await User.findByIdAndUpdate(user._id, { $set: { accessToken } });
 
-export function refreshAccessToken(token: any) {
-
-    return {
-        ...token,
-        accessToken: null,
-        refreshToken: null,
-        accessTokenExpiry: null,
-        refreshTokenExpiry: null
+        return {
+            ...token,
+            accessToken,
+            accessTokenExpiry,
+        };
+    } catch (error) {
+        console.error("refreshAccessToken Error:", error);
+        return { ...token, error: "CannotRefreshToken" };
     }
-
 }

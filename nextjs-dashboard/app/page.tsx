@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Input from './ui/input';
-import Button from './ui/button';
+import Input from './components/input';
+import Button from './components/button';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { signIn } from 'next-auth/react';
@@ -78,14 +78,12 @@ export default function LoginPage() {
         <main
             className="flex min-h-screen flex-col items-center justify-center p-6"
             style={{
-                // 1. Reference the image in the public folder
                 backgroundImage: "url('/background-pattern.png')",
-                // 2. This creates the 'wallpaper' effect
                 backgroundRepeat: 'repeat',
-                // 3. Adjust this size (300px-500px) to make the icons bigger or smaller
                 backgroundSize: '400px',
-                // 4. A fallback color similar to the image background (cream/off-white)
-                backgroundColor: '#FFFBF5'
+                backgroundColor: '#FFFBF5',
+                minHeight: '100vh', // Ensures the background covers the full screen
+                width: '100%'
             }}
         >
             <motion.div
@@ -209,6 +207,6 @@ export default function LoginPage() {
                     </button>
                 </div>
             </motion.div>
-        </main>
+        </main >
     );
 }

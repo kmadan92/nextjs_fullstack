@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import NavLinks from '@/app/ui/dashboard/nav-links';
+import NavLinks from '@/app/components/dashboard/nav-links';
 import { PowerIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { signOut } from 'next-auth/react';
+import { clearTokensInDB } from '@/lib/actions';
 
 export default function SideNav() {
   const { theme, setTheme } = useTheme();
@@ -24,6 +26,13 @@ export default function SideNav() {
   };
 
   const isDarkMode = theme === 'dark';
+
+  async function handleSignOut(e: React.FormEvent) {
+
+    e.preventDefault()
+    clearTokensInDB()
+    await signOut({ redirectTo: "/" })
+  }
 
   return (
     <aside
@@ -83,7 +92,9 @@ export default function SideNav() {
 
         {/* Sign Out - Matches Login Button Hover */}
         <form className="mb-2">
-          <button className="flex h-[48px] w-full items-center justify-start gap-4 rounded-xl bg-white/50 p-3 text-sm font-medium text-red-900 transition-colors hover:bg-red-900 hover:text-white dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-red-900">
+          <button
+            onClick={handleSignOut}
+            className="flex h-[48px] w-full items-center justify-start gap-4 rounded-xl bg-white/50 p-3 text-sm font-medium text-red-900 transition-colors hover:bg-red-900 hover:text-white dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-red-900">
             <PowerIcon className="w-6 min-w-[24px]" />
             <span className="opacity-0 translate-x-[-10px] whitespace-nowrap transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
               Sign Out
