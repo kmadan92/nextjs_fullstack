@@ -1,31 +1,49 @@
 import mongoose from 'mongoose';
 
-async function connect() {
-    try {
-        // 1. Check if already connected (Prevents multiple connections)
-        if (mongoose.connections[0].readyState) {
-            return;
-        }
+const MONGODB_URI = process.env.MONGODB_URI;
 
-        // 2. Connect
-        await mongoose.connect(process.env.MONGODB_URI!);
-        const connection = mongoose.connection;
-
-        // 3. Event Listeners (Only set them up once)
-        connection.on('connected', () => {
-            console.log('MongoDB connected successfully');
-        });
-
-        connection.on('error', (err) => {
-            console.log('MongoDB connection error. Please make sure MongoDB is running. ' + err);
-            // process.exit(); // ⚠️ Don't do this in a web app, just log the error.
-        });
-
-    } catch (error: any) {
-        console.log('Something went wrong!');
-        console.log(error);
-    }
+if (!MONGODB_URI) {
+    throw new Error('Please define the MONGODB_URI environment variable');
 }
 
-// 4. EXPORT the function so others can use it
+/**
+ * Global is used here to maintain a cached connection across hot reloads
+ * in development and across serverless function invocations.
+ */
+let cached = (global as any).mongoose;
+
+if (!cached) {
+    cached = (global as any).mongoose = { conn: null, promise: null };
+}
+
+async function connect() {
+    // 1. If we have a cached connection, return it immediately
+    if (cached.conn) {
+        return cached.conn;
+    }
+
+    // 2. If no connection promise exists, start the connection process
+    if (!cached.promise) {
+        const opts = {
+            bufferCommands: false, // Prevents hanging if the DB is down
+        };
+
+        console.log('--- Establishing New MongoDB Connection ---');
+        cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
+            return mongoose;
+        });
+    }
+
+    try {
+        // 3. Await the promise (either the new one or the existing one)
+        cached.conn = await cached.promise;
+    } catch (e) {
+        // If connection fails, clear the promise so the next attempt can try again
+        cached.promise = null;
+        throw e;
+    }
+
+    return cached.conn;
+}
+
 export default connect;
