@@ -9,6 +9,8 @@ export default auth((req) => {
     const { nextUrl } = req;
     const isLoggedIn = !!req.auth; // req.auth contains the session
 
+    //console.log("req auth: " + JSON.stringify(req.auth))
+
     const publicPaths = ["/", "/signup", "/unauthorized"];
     const isPublicPath = publicPaths.includes(nextUrl.pathname);
 
@@ -22,12 +24,6 @@ export default auth((req) => {
     // Redirect them to the home/login page
     if (!isPublicPath && !isLoggedIn) {
         return NextResponse.redirect(new URL("/", nextUrl));
-    }
-
-    // 3. Special Case: Token Rotation Errors
-    // If the JWT callback returned a RefreshTokenExpired error
-    if ((req.auth as any)?.error === "RefreshTokenExpired") {
-        return NextResponse.redirect(new URL("/?error=SessionExpired", nextUrl));
     }
 
     return NextResponse.next();

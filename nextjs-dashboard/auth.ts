@@ -60,10 +60,10 @@ export const { handlers: { GET, POST },
                             email: getUser.email,
                             role: getUser.role,
                             isApproved: getUser.isApproved,
-                            accessToken: getAccessToken(getUser),
-                            refreshToken: getRefreshToken(getUser),
-                            accessTokenExpiry: calculateAccessTokenExpiry(),
-                            refreshTokenExpiry: calculateRefreshTokenExpiry()
+                            accessToken: await getAccessToken(getUser),
+                            refreshToken: await getRefreshToken(getUser),
+                            accessTokenExpiry: await calculateAccessTokenExpiry(),
+                            refreshTokenExpiry: await calculateRefreshTokenExpiry()
                         };
 
                     } catch (err: any) {
@@ -174,10 +174,10 @@ export const { handlers: { GET, POST },
 
                         const db_user = await User.findOne({ email: user.email })
 
-                        const accessToken = getAccessToken(db_user)
-                        const refreshToken = getRefreshToken(db_user)
-                        const accessTokenExpiry = calculateAccessTokenExpiry()
-                        const refreshTokenExpiry = calculateRefreshTokenExpiry()
+                        const accessToken = await getAccessToken(db_user)
+                        const refreshToken = await getRefreshToken(db_user)
+                        const accessTokenExpiry = await calculateAccessTokenExpiry()
+                        const refreshTokenExpiry = await calculateRefreshTokenExpiry()
 
                         await User.findByIdAndUpdate(
                             db_user._id,
@@ -229,6 +229,10 @@ export const { handlers: { GET, POST },
             },
 
             async session({ session, token }) {
+
+                if (token.error) {
+                    (session as any).error = token.error;
+                }
 
                 if (token && session.user) {
 

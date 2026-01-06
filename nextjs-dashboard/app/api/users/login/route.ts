@@ -45,9 +45,9 @@ export async function POST(request: NextRequest) {
         }
 
 
-        const accessToken = getAccessToken(getUser)
+        const accessToken = await getAccessToken(getUser)
 
-        const refreshToken = getRefreshToken(getUser)
+        const refreshToken = await getRefreshToken(getUser)
 
         getUser.refreshToken = refreshToken
         await getUser.save()

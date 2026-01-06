@@ -1,6 +1,7 @@
 import '@/app/components/global.css';
 import { inter } from './components/fonts';
 import SessionWrapper from './components/SessionWrapper';
+import AuthGuard from './components/AuthGuard';
 
 export default function RootLayout({
   children,
@@ -12,7 +13,9 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
         {/* Wrap children so all components can access the session */}
         <SessionWrapper>
-          {children}
+          <AuthGuard>
+            {children}
+          </AuthGuard>
         </SessionWrapper>
       </body>
     </html>

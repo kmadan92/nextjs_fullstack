@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { signOut } from 'next-auth/react';
-import { clearTokensInDB } from '@/lib/actions';
+import { clearTokensInDB } from '@/lib/auth';
 
 export default function SideNav() {
   const { theme, setTheme } = useTheme();

@@ -1,7 +1,10 @@
+'use server'
+
 import jwt from "jsonwebtoken";
 import { JWT } from "next-auth/jwt";
 import connect from "./dbConfig";
 import User from "@/models/User";
+import { useSession } from "next-auth/react";
 import { auth } from "@/auth";
 
 const validateSecrets = () => {
@@ -10,7 +13,7 @@ const validateSecrets = () => {
     }
 };
 
-export function getAccessToken(user: any) {
+export async function getAccessToken(user: any) {
     try {
         validateSecrets();
         const tokenData = {
@@ -26,7 +29,7 @@ export function getAccessToken(user: any) {
     }
 }
 
-export function getRefreshToken(user: any) {
+export async function getRefreshToken(user: any) {
     try {
         validateSecrets();
         const tokenData = {
@@ -42,8 +45,8 @@ export function getRefreshToken(user: any) {
 }
 
 // 3. Update calculations (1 min = 60,000ms; 3 min = 180,000ms)
-export const calculateAccessTokenExpiry = () => Date.now() + 1 * 60 * 1000;
-export const calculateRefreshTokenExpiry = () => Date.now() + 3 * 60 * 1000;
+export const calculateAccessTokenExpiry = async () => Date.now() + 1 * 60 * 1000;
+export const calculateRefreshTokenExpiry = async () => Date.now() + 3 * 60 * 1000;
 
 export async function refreshAccessToken(token: JWT): Promise<JWT> {
     try {
@@ -56,8 +59,8 @@ export async function refreshAccessToken(token: JWT): Promise<JWT> {
             return { ...token, error: "TokenMismatch" };
         }
 
-        const accessToken = getAccessToken(user);
-        const accessTokenExpiry = calculateAccessTokenExpiry();
+        const accessToken = await getAccessToken(user);
+        const accessTokenExpiry = await calculateAccessTokenExpiry();
 
         await User.findByIdAndUpdate(user._id, { $set: { accessToken } });
 
@@ -69,5 +72,26 @@ export async function refreshAccessToken(token: JWT): Promise<JWT> {
     } catch (error) {
         console.error("refreshAccessToken Error:", error);
         return { ...token, error: "CannotRefreshToken" };
+    }
+}
+
+export async function clearTokensInDB() {
+    try {
+        const session = await auth();
+
+        if (!session) {
+            console.error("No session found to clear tokens")
+            return
+        }
+
+        await connect();
+        await User.findByIdAndUpdate(session?.id, {
+            $set: { accessToken: null, refreshToken: null },
+        });
+
+        console.log(`Tokens cleared successfully for: ${session?.id}`);
+    } catch (error) {
+        console.error("Failed to clear tokens in DB:", error);
+        // We don't throw error here so that the client-side redirect can still proceed
     }
 }
