@@ -21,7 +21,7 @@ export async function getAccessToken(user: any) {
             email: user.email,
             role: user.role,
         };
-        // 1. Set to 1 minute
+
         return jwt.sign(tokenData, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "1m" });
     } catch (error) {
         console.error("Error generating Access Token:", error);
@@ -36,7 +36,7 @@ export async function getRefreshToken(user: any) {
             id: user._id?.toString() || user.id,
             email: user.email,
         };
-        // 2. Set to 3 minutes
+
         return jwt.sign(tokenData, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: "3m" });
     } catch (error) {
         console.error("Error generating Refresh Token:", error);
@@ -44,7 +44,7 @@ export async function getRefreshToken(user: any) {
     }
 }
 
-// 3. Update calculations (1 min = 60,000ms; 3 min = 180,000ms)
+
 export const calculateAccessTokenExpiry = async () => Date.now() + 1 * 60 * 1000;
 export const calculateRefreshTokenExpiry = async () => Date.now() + 3 * 60 * 1000;
 

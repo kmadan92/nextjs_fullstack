@@ -15,7 +15,9 @@ export default function UnauthorizedPage() {
         <div className="text-6xl mb-4">🚫</div>
         <h1 className="text-2xl font-bold text-red-900 mb-2">Access Restricted</h1>
         <p className="text-red-950 mb-8">
-          I checked my list twice, but I don't see your name! <span className='text-3xl'>🕵️‍♂️ </span>My photos are Top Secret. Please ask my Papa or Mama to add you to the VIP list!
+          <span className='text-3xl'>🛰️ 🛡️</span><br></br>
+          This is top secret project!! <span className='text-3xl'>🕵️‍♂️ </span><br></br>My Mumma has deployed a satellite to run a DNA identity scan and you are not detected.<br></br>
+          Please ask my Papa for a security clearance and add you to the family's VIP list!
         </p>
 
         <Link
