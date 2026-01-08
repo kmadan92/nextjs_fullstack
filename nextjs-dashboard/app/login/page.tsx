@@ -194,18 +194,6 @@ export default function LoginPage() {
                         </Link>
                     </p>
                 </form>
-
-
-                {/* Footer Links */}
-                <div className="mt-8 text-center space-y-4">
-
-                    <button
-                        onClick={() => router.push('/')}
-                        className="text-xs text-red-700 hover:text-red-950 transition-colors"
-                    >
-                        ← Return to Home
-                    </button>
-                </div>
             </motion.div>
         </main >
     );
