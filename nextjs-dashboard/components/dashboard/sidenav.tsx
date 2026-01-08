@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import NavLinks from '@/app/components/dashboard/nav-links';
+import NavLinks from '@/components/dashboard/nav-links';
 import { PowerIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';

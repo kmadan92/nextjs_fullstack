@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Input from '../components/input';
-import Button from '../components/button';
+import Input from '../../components/input';
+import Button from '../../components/button';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import axios from "axios"
@@ -39,7 +39,7 @@ export default function SignUpPage() {
             setIsLoading(true);
             const response = await axios.post("api/users/signup", formData) // simulate API call
             setIsSuccess(true);
-            router.push('/');
+            router.push('/login');
 
         } catch (err) {
             setError('Something went wrong. Please try again.');

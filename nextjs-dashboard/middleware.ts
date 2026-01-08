@@ -11,19 +11,19 @@ export default auth((req) => {
 
     //console.log("req auth: " + JSON.stringify(req.auth))
 
-    const publicPaths = ["/", "/signup", "/unauthorized"];
+    const publicPaths = ["/login", "/signup", "/unauthorized"];
     const isPublicPath = publicPaths.includes(nextUrl.pathname);
 
     // 1. If user is logged in and tries to access public pages (like login/signup)
     // Redirect them to the dashboard
     if (isPublicPath && isLoggedIn) {
-        return NextResponse.redirect(new URL("/dashboard", nextUrl));
+        return NextResponse.redirect(new URL("/", nextUrl));
     }
 
     // 2. If user is NOT logged in and tries to access protected pages
     // Redirect them to the home/login page
     if (!isPublicPath && !isLoggedIn) {
-        return NextResponse.redirect(new URL("/", nextUrl));
+        return NextResponse.redirect(new URL("/login", nextUrl));
     }
 
     return NextResponse.next();

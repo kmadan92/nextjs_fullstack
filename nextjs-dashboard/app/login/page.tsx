@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Input from './components/input';
-import Button from './components/button';
+import Input from '../../components/input';
+import Button from '../../components/button';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { signIn } from 'next-auth/react';
@@ -51,7 +51,7 @@ export default function LoginPage() {
                 return
             }
 
-            router.push("/dashboard")
+            router.push("/")
 
         } catch (err: any) {
 
@@ -65,7 +65,7 @@ export default function LoginPage() {
     const handleGoogleLogin = async () => {
         try {
             setIsLoadingGoogle(true);
-            await signIn('google', { callbackUrl: '/dashboard' })
+            await signIn('google', { callbackUrl: '/' })
         } catch (err: any) {
             setError('Something went wrong. Please try again.');
         } finally {

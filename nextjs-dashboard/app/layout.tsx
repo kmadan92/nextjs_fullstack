@@ -1,7 +1,6 @@
-import '@/app/components/global.css';
-import { inter } from './components/fonts';
-import SessionWrapper from './components/SessionWrapper';
-import AuthGuard from './components/AuthGuard';
+import '@/app/global.css';
+import SessionWrapper from '../components/SessionWrapper';
+import AuthGuard from '../components/AuthGuard';
 
 export default function RootLayout({
   children,
@@ -10,7 +9,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>
+      <body>
         {/* Wrap children so all components can access the session */}
         <SessionWrapper>
           <AuthGuard>

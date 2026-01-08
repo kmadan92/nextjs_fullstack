@@ -15,7 +15,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         if (session?.error === "RefreshTokenExpired") {
 
             clearTokensInDB();
-            signOut({ callbackUrl: "/login?error=SessionExpired" });
+            signOut({ callbackUrl: "/login" });
 
         }
 
