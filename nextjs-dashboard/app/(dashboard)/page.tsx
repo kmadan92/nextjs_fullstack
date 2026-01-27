@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sun, Heart, Sparkles, ChevronRight, Quote } from 'lucide-react';
 
+
 export default function DashboardPage(): React.JSX.Element {
     const router = useRouter();
 

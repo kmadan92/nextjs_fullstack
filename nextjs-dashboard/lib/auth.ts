@@ -22,7 +22,7 @@ export async function getAccessToken(user: any) {
             role: user.role,
         };
 
-        return jwt.sign(tokenData, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "1m" });
+        return jwt.sign(tokenData, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "1d" });
     } catch (error) {
         console.error("Error generating Access Token:", error);
         throw error;
@@ -37,7 +37,7 @@ export async function getRefreshToken(user: any) {
             email: user.email,
         };
 
-        return jwt.sign(tokenData, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: "3m" });
+        return jwt.sign(tokenData, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: "7d" });
     } catch (error) {
         console.error("Error generating Refresh Token:", error);
         throw error;
@@ -45,8 +45,8 @@ export async function getRefreshToken(user: any) {
 }
 
 
-export const calculateAccessTokenExpiry = async () => Date.now() + 1 * 60 * 1000;
-export const calculateRefreshTokenExpiry = async () => Date.now() + 3 * 60 * 1000;
+export const calculateAccessTokenExpiry = async () => Date.now() + 24 * 60 * 60 * 1000;
+export const calculateRefreshTokenExpiry = async () => Date.now() + 7 * 24 * 60 * 60 * 1000;
 
 export async function refreshAccessToken(token: JWT): Promise<JWT> {
     try {
