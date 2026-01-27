@@ -20,7 +20,7 @@ export default function DashboardPage(): React.JSX.Element {
             iconBg: 'bg-amber-100',
             bgGradient: 'from-amber-50 via-orange-50 to-amber-100',
             borderColor: 'border-amber-200',
-            href: '/videos/grandparents'
+            href: '/grandparents'
         },
         {
             id: 'parents',
@@ -32,7 +32,7 @@ export default function DashboardPage(): React.JSX.Element {
             iconBg: 'bg-rose-100',
             bgGradient: 'from-rose-50 via-red-50 to-pink-100',
             borderColor: 'border-rose-200',
-            href: '/videos/parents'
+            href: '/parents'
         },
         {
             id: 'kiaan',
@@ -44,7 +44,7 @@ export default function DashboardPage(): React.JSX.Element {
             iconBg: 'bg-sky-100',
             bgGradient: 'from-sky-50 via-blue-50 to-indigo-100',
             borderColor: 'border-sky-200',
-            href: '/videos/kiaan'
+            href: '/kiaan'
         }
     ];
 
