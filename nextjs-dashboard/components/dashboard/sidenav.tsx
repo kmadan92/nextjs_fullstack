@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { signOut } from 'next-auth/react';
 import { clearTokensInDB } from '@/lib/auth';
 import kiaan_logo from '@/public/kiaan-memory.png'
+import { motion } from 'framer-motion';
 
 export default function SideNav() {
   const { theme, setTheme } = useTheme();
@@ -52,7 +53,8 @@ export default function SideNav() {
         <div className="relative flex h-12 w-full items-center justify-center transition-all duration-300 group-hover:h-48">
           {/* Small Icon (Collapsed) - Matches Login 'Red' Theme */}
           <div className="absolute opacity-100 transition-opacity duration-300 group-hover:opacity-0">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 font-bold text-red-900 ring-2 ring-white shadow-sm dark:bg-red-900 dark:text-red-100 dark:ring-stone-800">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 font-bold text-red-900 ring-2 ring-white shadow-sm dark:bg-red-900 dark:text-red-100 dark:ring-stone-800">
               <Image
                 src="/kiaan-memory.png"
                 alt="Kiaan's Memory Logo"
@@ -61,7 +63,9 @@ export default function SideNav() {
           </div>
 
           {/* Full Logo (Expanded) */}
-          <div className="relative h-full w-full opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+          <motion.div
+            whileHover={{ rotate: 360, transition: { duration: 1 } }}
+            className="relative h-full w-full opacity-0 transition-opacity duration-500 group-hover:opacity-100">
             <Image
               src={kiaan_logo}
               alt="Kiaan's Memories Logo"
@@ -71,7 +75,7 @@ export default function SideNav() {
               placeholder='blur'
               blurDataURL=''
             />
-          </div>
+          </motion.div>
         </div>
 
         <div className="whitespace-nowrap opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -110,6 +114,6 @@ export default function SideNav() {
           </button>
         </form>
       </div>
-    </aside>
+    </aside >
   );
 }
