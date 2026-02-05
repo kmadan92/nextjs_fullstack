@@ -11,13 +11,16 @@ const FolderSchema = new Schema({
         type: String,
         default: "something"
     },
-    parent: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Folder"
+    fileStructure: {
+        type: String,
+        required: true
     },
-    takenAt: {
+    MemoryTimestamp: {
         type: Date,
         required: true
+    },
+    tags: {
+        type: Array<String>
     }
 },
 

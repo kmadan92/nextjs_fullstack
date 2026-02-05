@@ -17,7 +17,9 @@ const UserSchema = new Schema({
     },
     role: {
         type: String,
+        enum: ['admin', 'other'],
         default: "other",
+        required: true
     },
     accessToken: {
         type: String

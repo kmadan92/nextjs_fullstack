@@ -13,8 +13,15 @@ const MediaSchema = new Schema({
     mediaType: {
         type: String,
         enum: ['video', 'photo']
+    },
+    fileStructure: {
+        type: String,
+        required: true
     }
-})
+},
+    {
+        timestamps: true
+    })
 
 MediaSchema.pre("save", function (next) {
 
