@@ -1,8 +1,9 @@
 'use client'
 
-import Button from "@/components/button"
+import { Button } from "@/components/ui/button"
 import { useSession } from "next-auth/react"
 import { useState, useEffect } from "react"
+import { OpenWizard } from "@/components/OpenWizard"
 
 export default function RelationPage() {
 
@@ -20,21 +21,7 @@ export default function RelationPage() {
         <>
             {isAdmin && (
                 <div className="flex flex-row justify-end">
-                    <Button
-                        className="relative p-3 m-1 text-base shadow-lg bg-red-900 hover:bg-red-700 text-gray-700 border border-gray-100"
-                        type="button">
-                        Create Folder
-                    </Button>
-                    <Button
-                        className="relative p-3 m-1 text-base shadow-lg bg-red-900 hover:bg-red-700 text-gray-700 border border-gray-100"
-                        type="button">
-                        Create Image
-                    </Button>
-                    <Button
-                        className="relative p-3 m-1 text-base shadow-lg bg-red-900 hover:bg-red-700 text-gray-700 border border-gray-100"
-                        type="button">
-                        Create Folder
-                    </Button>
+                    <OpenWizard />
                 </div>
             )}
         </>
