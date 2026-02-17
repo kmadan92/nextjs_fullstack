@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { useSession } from "next-auth/react"
 import { useState, useEffect } from "react"
 import { OpenWizard } from "@/components/OpenWizard"
+import { Folder } from "@/components/Folder"
 
 export default function RelationPage() {
 
@@ -20,10 +21,18 @@ export default function RelationPage() {
 
         <>
             {isAdmin && (
-                <div className="flex flex-row justify-end">
+                <div className="flex flex-row justify-end m-4">
                     <OpenWizard />
                 </div>
             )}
+
+            <div className="grid sm:grid-cols-4 md:grid-cols-3 gap-4">
+                <Folder />
+                <Folder />
+                <Folder />
+                <Folder />
+
+            </div>
         </>
     )
 }

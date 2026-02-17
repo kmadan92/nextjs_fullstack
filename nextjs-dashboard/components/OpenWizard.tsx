@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { FolderPlus, Image as ImageIcon, Video, ArrowLeft } from "lucide-react"
 import { PlusCircleIcon } from '@heroicons/react/24/outline'
+import { usePathname } from "next/navigation";
 
 // Define the 3 types of actions
 type WizardType = "folder" | "images" | "videos" | null
@@ -24,6 +25,8 @@ export function OpenWizard() {
     const [open, setOpen] = useState(false)
     const [step, setStep] = useState(1)
     const [selectedType, setSelectedType] = useState<WizardType>(null)
+
+    const path = usePathname();
 
     // Reset state when dialog closes
     const handleOpenChange = (isOpen: boolean) => {
@@ -44,13 +47,45 @@ export function OpenWizard() {
         setStep(1)
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        // Gather form data
+
         const formData = new FormData(e.target as HTMLFormElement)
         const data = Object.fromEntries(formData)
 
-        console.log(`Submitting ${selectedType} form:`, data)
+        if (selectedType === "folder") {
+
+            let payload: any = {
+                folderName: data.folderName,
+                fileStructure: path,
+                memorytimestamp: data.memorytimestamp,
+                tags: data.tags
+            }
+
+            const coverImage = data.thumbnail as File;
+
+            if (coverImage && coverImage.size > 0) {
+                payload = {
+                    ...payload,
+                    coverImage: "placeholder"
+                }
+            }
+
+            const response = await fetch("/api/folder/createFolder", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            })
+
+            alert(`Submitting ${selectedType} form: ${JSON.stringify(payload, null, 2)}`)
+
+            if (!response.ok) {
+                const err = await response.json()
+                throw new Error(err.error || "Failed to create Folder")
+            }
+
+        }
+
         setOpen(false)
     }
 
@@ -68,7 +103,7 @@ export function OpenWizard() {
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>
-                        {step === 1 ? "Select Action" : `Create/Insert ${selectedType}`}
+                        {step === 1 ? "Select Action" : `Create / Insert ${selectedType} `}
                     </DialogTitle>
                     <DialogDescription>
                         {step === 1
@@ -135,7 +170,7 @@ export function OpenWizard() {
                                         <Input id="folderName" name="folderName" required />
                                     </div>
                                     <div className="grid w-full items-center gap-1.5">
-                                        <Label htmlFor="thumbnail">Cover Image <span className="text-red-500 ml-0.5">*</span></Label>
+                                        <Label htmlFor="thumbnail">Cover Image </Label>
                                         <Input id="thumbnail" name="thumbnail" type="file" accept="image/*" />
                                     </div>
                                     <div className="grid w-full items-center gap-1.5">

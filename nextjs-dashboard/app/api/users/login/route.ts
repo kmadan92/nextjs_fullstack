@@ -6,12 +6,10 @@ import jwt from "jsonwebtoken"
 import { getAccessToken } from "@/lib/auth";
 import { getRefreshToken } from "@/lib/auth";
 
-connect();
-
 export async function POST(request: NextRequest) {
 
     try {
-
+        await connect();
         const reqBody = await request.json()
         const { email, password } = reqBody
 

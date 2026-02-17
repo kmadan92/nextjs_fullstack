@@ -2,14 +2,15 @@ import mongoose, { Schema, models, model } from "mongoose";
 
 const FolderSchema = new Schema({
 
-    name: {
+    folderName: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        unique: true
     },
-    thumbnail: {
+    coverImage: {
         type: String,
-        default: "something"
+        default: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png"
     },
     fileStructure: {
         type: String,
@@ -20,7 +21,7 @@ const FolderSchema = new Schema({
         required: true
     },
     tags: {
-        type: Array<String>
+        type: String
     }
 },
 
